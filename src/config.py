@@ -44,9 +44,15 @@ DRUG_NAMES = [
 
 ##################### TRAINING PARAMETERS ##################### 
 
-N_CVFOLDS = 5
-N_EPOCHS = 100
-PATIENCE = 10
+BATCH_SIZE = 32
+LEARNING_RATE = 0.001
 MIN_DELTA_TRAIN_LOSS = 0.0001
+N_CVFOLDS = 5
+N_EPOCHS = 50
 
 ##################### HYPERPARAMETERS #####################
+
+INPUT_DIM = 3120  # 26 electrodes * 120 timepoints
+LATENT_DIM = 64
+RECONSTRUCTION_WEIGHT = 1.0
+PREDICTION_WEIGHT = 1.0

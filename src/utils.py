@@ -1,4 +1,5 @@
 from src.config import *
+from src.dataset import EEGDataset
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
@@ -37,12 +38,13 @@ def _check_normalization(eeg_data, dataset_name):
     Check if EEG data is normalized per patient per electrode.
 
     Args:
-        eeg_data (np.ndarray): EEG data of shape (n_patients, n_electrodes, n_timepoints).
+        eeg_data (np.ndarray): EEG data - either (n_patients, 26, 120) or (n_patients, 3120)
         dataset_name (str): Name of the dataset for logging (train or test).
-
-    Raises:
-        ValueError: If the EEG data is not normalized (mean close to 0 and std close to 1).
     """
+    # Handle both shapes
+    if eeg_data.ndim == 2:  # Flattened: (n_patients, 3120)
+        eeg_data = eeg_data.reshape(-1, 26, 120)
+    
     # Mean and std across time dimension (axis=2) for each patient-electrode
     means = np.mean(eeg_data, axis=2)  # (n_patients, n_electrodes)
     stds = np.std(eeg_data, axis=2)    # (n_patients, n_electrodes)
@@ -81,48 +83,44 @@ def normalize_eeg_data():
         
         print(f"\n ✓✓✓ Test data normalized. ✓✓✓ \nMean: {np.mean(normalized_data):.3f}, STD: {np.std(normalized_data):.3f}, Shape: {normalized_data.shape}")
     
-def load_train_test_data():
+def load_train_test_datasets():
     """
-    Load train and test data from HDF5 files. All values are numpy arrays.
-    Checks if EEG data is normalized per patient per electrode.
-
+    Load train and test data from HDF5 files and return as EEGDataset objects.
+    
     Returns:
-        tuple: (train_data, test_data) where each is a dictionary containing:
-               'eeg_data', 'patient_ids', 'response', 'treatment'.
+        tuple: (train_dataset, test_dataset) - EEGDataset objects ready for DataLoader
     """
-    train_data = {}
-    test_data = {}
     
-    # Load train data
+    # Load train dataset
     with h5py.File(TRAIN_DATA_FILE, 'r') as f:
-        train_data = {
-            'eeg_data': f['eeg_data'][:],
-            'patient_ids': f['patient_ids'][:],
-            'response': f['response'][:],
-            'treatment': f['treatment'][:]
-        }
+        train_dataset = EEGDataset(
+            f['eeg_data'][:],
+            f['patient_ids'][:],
+            f['response'][:],
+            f['treatment'][:]
+        )
     
-    # Load test data
+    # Load test dataset
     with h5py.File(TEST_DATA_FILE, 'r') as f:
-        test_data = {
-            'eeg_data': f['eeg_data'][:],
-            'patient_ids': f['patient_ids'][:],
-            'response': f['response'][:],
-            'treatment': f['treatment'][:],
-        }
+        test_dataset = EEGDataset(
+            f['eeg_data'][:],
+            f['patient_ids'][:],
+            f['response'][:],
+            f['treatment'][:]
+        )
     
     # Check normalization of EEG data
-    _check_normalization(train_data['eeg_data'], "Train")
-    _check_normalization(test_data['eeg_data'], "Test")
+    _check_normalization(train_dataset.eeg_data.numpy(), "Train")
+    _check_normalization(test_dataset.eeg_data.numpy(), "Test")
     print("\n ✓✓✓ EEG data is normalized (per patient per electrode) ✓✓✓ \n")
 
     # Print shapes of the data
-    print("=" * 40 + "=" * 25)
+    print("=" * 65)
     print("TRAIN DATA".ljust(40) + "TEST DATA")
-    print("=" * 40 + "=" * 25)
-    for key in train_data.keys():
-        train_shape = train_data[key].shape
-        test_shape = test_data[key].shape
-        print(f"{key}: {train_shape}".ljust(40) + f"{key}: {test_shape}")
+    print("=" * 65)
+    print(f"eeg_data: {train_dataset.eeg_data.shape}".ljust(40) + f"eeg_data: {test_dataset.eeg_data.shape}")
+    print(f"patient_ids: {train_dataset.patient_ids.shape}".ljust(40) + f"patient_ids: {test_dataset.patient_ids.shape}")
+    print(f"response: {train_dataset.response.shape}".ljust(40) + f"response: {test_dataset.response.shape}")
+    print(f"treatment: {train_dataset.treatment.shape}".ljust(40) + f"treatment: {test_dataset.treatment.shape}")
 
-    return train_data, test_data
+    return train_dataset, test_dataset

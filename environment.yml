@@ -1,0 +1,13 @@
+name: venv
+channels:
+  - defaults
+dependencies:
+  - h5py
+  - pip
+  - pandas
+  - matplotlib
+  - numpy
+  - pytorch
+  - scikit-learn
+  - seaborn
+prefix: /Users/janellecheung/miniconda3/envs/venv

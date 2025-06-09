@@ -1,7 +1,7 @@
 from pathlib import Path
 
 SEED = 42
-TARGETS = ['response', 'remission']
+TARGETS = ['response']
 
 ######################### PATHS #########################
 
@@ -15,8 +15,37 @@ MODELS_DIR = PROJECT_ROOT/'models'
 DIRECTORIES = (DATA_DIR, FIGURES_DIR, LOGS_DIR, MODELS_DIR)
 
 # HDF5 data files
-TRAIN_DATA_FILE = DATA_DIR / 'dummy_train_data.h5'
-TEST_DATA_FILE = DATA_DIR / 'dummy_test_data.h5'
+TRAIN_DATA_FILE = DATA_DIR / 'train_data_response.csv'
+TEST_DATA_FILE = DATA_DIR / 'test_data_response.csv'
+
+###################### INPUT DIMENSIONS #####################
+
+INPUT_TYPES = ['clinical', 'eeg', 'eeg+clinical']
+
+CLINICAL_COLS = [
+    'age', 'hamd_1_1', 'hamd_2_1', 'hamd_3_1', 'hamd_4_1', 'hamd_5_1', 'hamd_6_1', 'hamd_7_1',
+    'hamd_8_1', 'hamd_9_1', 'hamd_10_1', 'hamd_11_1', 'hamd_12_1', 'hamd_13_1', 'hamd_14_1',
+    'hamd_15_1', 'hamd_16_1', 'hamd_17_1', 'hamd_total_1', 'hamd_emotions_1', 'hamd_behavioral_1',
+    'hamd_somatic_1', 'race_Black', 'race_Hawaiian/Pacific Islander', 'race_Hispanic',
+    'race_Mixed', 'race_Other', 'race_White', 'gender_MALE'
+]
+
+N_TRAIN_PATIENTS = 594
+N_TEST_PATIENTS = 100
+N_CLINICAL_FEATURES = len(CLINICAL_COLS)
+N_ELECTRODES = 26
+N_TIMEPOINTS = 116
+
+ELECTRODES = ['C3', 'C4', 'CP3', 'CP4', 'CPz', 'Cz', 'F3', 'F4', 'F7', 'F8', 'FC3', 'FC4', 'FCz', 'Fp1', 'Fp2', 'Fz', 'O1', 'O2', 'Oz', 'P3', 'P4', 'Pz', 'T3', 'T4', 'T5', 'T6']
+EEG_COLS = [f'{electrode}t{tp}' for electrode in ELECTRODES for tp in range(1, N_TIMEPOINTS+1)]
+
+METADATA_COLS = ['patient_id', 'treatment', 'response']
+
+INPUT_DIMENSIONS = {
+    'clinical': N_CLINICAL_FEATURES,
+    'eeg': N_ELECTRODES * N_TIMEPOINTS,
+    'eeg+clinical': N_CLINICAL_FEATURES + (N_ELECTRODES * N_TIMEPOINTS)
+}
 
 ##################### TREATMENT INFO #####################
 
@@ -52,7 +81,7 @@ N_EPOCHS = 50
 
 ##################### HYPERPARAMETERS #####################
 
-INPUT_DIM = 3120  # 26 electrodes * 120 timepoints
+AUTOENCODER_INPUT_DIM = N_ELECTRODES * N_TIMEPOINTS
 LATENT_DIM = 64
 RECONSTRUCTION_WEIGHT = 1.0
 PREDICTION_WEIGHT = 1.0

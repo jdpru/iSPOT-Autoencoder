@@ -4,7 +4,7 @@ from pathlib import Path
 from src.config import *
 
 class SemiSupervisedAutoencoder(nn.Module):
-    def __init__(self, input_dim=INPUT_DIM, latent_dim=LATENT_DIM):
+    def __init__(self, input_dim=AUTOENCODER_INPUT_DIM, latent_dim=LATENT_DIM):
         super().__init__()
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 512),

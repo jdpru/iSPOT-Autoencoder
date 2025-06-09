@@ -1,10 +1,12 @@
 from src.models.baseline_autoencoder import BaselineAutoencoder
 from src.models.semisupervised_autoencoder import SemiSupervisedAutoencoder
-from src.training import *
+from src.autoencoder_training import *
 from src.utils import *
 
-def run_baseline_experiment(train_loader, test_loader):
-    """Run complete baseline autoencoder experiment"""
+# TO-DO: UPDATE ALL OF THESE
+
+def run_unsupervised_ae_experiment(train_loader, test_loader):
+    """Run baseline unsupervised autoencoder experiment"""
     print("\n" + "=" * 50)
     print("BASELINE AUTOENCODER EXPERIMENT")
     print("=" * 50)
@@ -14,7 +16,7 @@ def run_baseline_experiment(train_loader, test_loader):
     
     # Train autoencoder
     print("Training baseline autoencoder...")
-    model = train_baseline_autoencoder(model, train_loader, n_epochs=N_EPOCHS)
+    model = train_unsupervised_autoencoder(model, train_loader, n_epochs=N_EPOCHS)
     
     # Extract features
     print("Extracting latent features...")
@@ -23,7 +25,7 @@ def run_baseline_experiment(train_loader, test_loader):
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, predictions = train_and_evaluate_logistic_regression(
+    lr_model, predictions = train_and_evaluate_logreg(
         train_X, train_y, test_X, test_y
     )
     

@@ -6,8 +6,8 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import numpy as np
 from src.config import *
 
-def train_baseline_autoencoder(model, train_loader, n_epochs=N_EPOCHS, lr=LEARNING_RATE):
-    """Train baseline autoencoder with reconstruction loss only"""
+def train_unsupervised_autoencoder(model, train_loader, n_epochs=N_EPOCHS, lr=LEARNING_RATE):
+    """Train baseline unsupervised autoencoder with reconstruction loss only"""
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
@@ -99,11 +99,11 @@ def extract_latent_features(model, data_loader):
     
     return np.vstack(latent_features), np.concatenate(responses)
 
-def train_and_evaluate_logistic_regression(train_features, train_labels, 
-                                         test_features, test_labels):
+def train_and_evaluate_logreg(train_features, test_features, train_labels, 
+                                        test_labels):
     """Train logistic regression on latent features and evaluate"""
     # Train logistic regression
-    lr_model = LogisticRegression(random_state=42, max_iter=1000)
+    lr_model = LogisticRegression(random_state=SEED, max_iter=1000)
     lr_model.fit(train_features, train_labels)
     
     # Predict on test set

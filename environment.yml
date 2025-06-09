@@ -2,7 +2,6 @@ name: venv
 channels:
   - defaults
 dependencies:
-  - h5py
   - pip
   - pandas
   - matplotlib

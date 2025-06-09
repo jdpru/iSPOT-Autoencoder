@@ -9,20 +9,25 @@ class SemiSupervisedAutoencoder(nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 512),
             nn.ReLU(),
+            nn.Dropout(DROPOUT_RATE),
             nn.Linear(512, 256),
             nn.ReLU(),
+            nn.Dropout(DROPOUT_RATE),
             nn.Linear(256, latent_dim)
         )
         self.decoder = nn.Sequential(
             nn.Linear(latent_dim, 256),
             nn.ReLU(),
+            nn.Dropout(DROPOUT_RATE),
             nn.Linear(256, 512),
             nn.ReLU(),
+            nn.Dropout(DROPOUT_RATE),
             nn.Linear(512, input_dim)
         )
         self.predictor = nn.Sequential(
             nn.Linear(latent_dim, 32),
             nn.ReLU(),
+            nn.Dropout(DROPOUT_RATE),
             nn.Linear(32, 1),
             nn.Sigmoid()
         )

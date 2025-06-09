@@ -13,10 +13,11 @@ from torch.utils.data import *
 def main():
     # Load data
     data = load_train_test_data()
-    train_eeg_dataloader, test_eeg_dataloader = create_eeg_dataloaders(data)
+    full_train_eeg_dataloader = make_eeg_dataloader_from_dict(data['train'])
+    test_eeg_dataloader = make_eeg_dataloader_from_dict(data['test'], shuffle=False)
 
     # Run all experiments
-    results = run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader)
+    results = run_all_experiments(data, full_train_eeg_dataloader, test_eeg_dataloader)
 
     # Analyze results
     print("\n" + "=" * 60)

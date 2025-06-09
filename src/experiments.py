@@ -2,7 +2,8 @@ import numpy as np
 from src.configs.config import *
 from src.models.unsupervised_ae import UnsupervisedAutoencoder
 from src.models.semisupervised_ae import SemiSupervisedAutoencoder
-from src.autoencoder_training import *
+from src.data.data_utils import extract_latent_features, make_eeg_dataloader_from_dict
+from src.training import *
 from src.utils import *
 
 def run_clinical_only_experiment(train_clinical_data, test_clinical_data, train_y, test_y):

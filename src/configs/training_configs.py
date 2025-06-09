@@ -1,0 +1,14 @@
+##################### TRAINING PARAMETERS ##################### 
+
+BATCH_SIZE = 32
+MIN_DELTA_TRAIN_LOSS = 0.0001
+N_CVFOLDS = 5
+N_EPOCHS = 50
+
+##################### HYPERPARAMETERS #####################
+
+LATENT_DIM = 64
+RECONSTRUCTION_WEIGHT = 1.0
+PREDICTION_WEIGHT = 1.0
+DROPOUT_RATE = 0.2
+LEARNING_RATE = 0.001

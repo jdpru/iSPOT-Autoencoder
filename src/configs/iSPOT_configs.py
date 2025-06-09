@@ -1,22 +1,4 @@
-from pathlib import Path
-
-SEED = 42
 TARGETS = ['response']
-
-######################### PATHS #########################
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-# Directories
-DATA_DIR = PROJECT_ROOT/'data'
-FIGURES_DIR = PROJECT_ROOT/'figures'
-LOGS_DIR = PROJECT_ROOT/'logs'
-MODELS_DIR = PROJECT_ROOT/'models'
-DIRECTORIES = (DATA_DIR, FIGURES_DIR, LOGS_DIR, MODELS_DIR)
-
-# HDF5 data files
-TRAIN_DATA_FILE = DATA_DIR / 'train_data_response.csv'
-TEST_DATA_FILE = DATA_DIR / 'test_data_response.csv'
 
 ###################### INPUT DIMENSIONS #####################
 
@@ -71,18 +53,3 @@ DRUG_NAMES = [
     'Sertraline',       # DRUG_NAMES[SER] 
     'Venlafaxine XR'    # DRUG_NAMES[VEN]
 ]
-
-##################### TRAINING PARAMETERS ##################### 
-
-BATCH_SIZE = 32
-MIN_DELTA_TRAIN_LOSS = 0.0001
-N_CVFOLDS = 5
-N_EPOCHS = 50
-
-##################### HYPERPARAMETERS #####################
-
-LATENT_DIM = 64
-RECONSTRUCTION_WEIGHT = 1.0
-PREDICTION_WEIGHT = 1.0
-DROPOUT_RATE = 0.2
-LEARNING_RATE = 0.001

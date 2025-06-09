@@ -1,6 +1,4 @@
-from src.config import *
-from src.data.dataset import EEGDataset
-import matplotlib.pyplot as plt
+from src.configs import *
 import numpy as np
 from pathlib import Path
 import os

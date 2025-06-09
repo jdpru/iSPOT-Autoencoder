@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from pathlib import Path
-from src.config import *
+from src.configs import *
 
 class SemiSupervisedAutoencoder(nn.Module):
     def __init__(self, input_dim=AUTOENCODER_INPUT_DIM, latent_dim=LATENT_DIM):

@@ -6,6 +6,6 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.lines import Line2D
 from matplotlib.ticker import FuncFormatter
 from sklearn.metrics import confusion_matrix
-from src.config import *
+from src.configs import *
 from src.utils import *
 

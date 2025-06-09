@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from pathlib import Path
-from src.config import *
+from src.configs import *
 
 # TO-DO: 
 

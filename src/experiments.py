@@ -1,4 +1,5 @@
 import numpy as np
+from src.configs.config import *
 from src.models.unsupervised_ae import UnsupervisedAutoencoder
 from src.models.semisupervised_ae import SemiSupervisedAutoencoder
 from src.autoencoder_training import *

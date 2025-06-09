@@ -4,7 +4,7 @@ import torch.optim as optim
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
 import numpy as np
-from src.config import *
+from src.configs import *
 
 def train_unsupervised_autoencoder(model, train_loader, n_epochs=N_EPOCHS, lr=LEARNING_RATE):
     """Train baseline unsupervised autoencoder with reconstruction loss only"""

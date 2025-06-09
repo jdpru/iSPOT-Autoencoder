@@ -4,9 +4,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from pathlib import Path
-from src.config import *
-from src.data.dataset import *
-from src.data.data_loading import *
+from src.configs import *
+from src.data import *
 from src.utils import *
 from src.experiments import *
 from torch.utils.data import *

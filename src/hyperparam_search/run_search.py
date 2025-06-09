@@ -20,7 +20,7 @@ def run_search():
     train_loader = make_eeg_dataloader_from_dict(train_dict)
     val_loader = make_eeg_dataloader_from_dict(val_dict, shuffle=False)
     
-    # Run hyperparam search for unsupervised autoencoder
+    # 1. Hyper param search : Unsupervised autoencoder
     print("\n" + "=" * 50)
     print("HYPERPARAMETER SEARCH: UNSUPERVISED AUTOENCODER")
     print("=" * 50)
@@ -28,10 +28,10 @@ def run_search():
         train_loader, val_loader, unsup_ae_search_space
     )
     
+    # 2. Hyper param search : Semi-supervised autoencoder
     print("\n" + "=" * 50)
     print("HYPERPARAMETER SEARCH: SEMI-SUPERVISED AUTOENCODER")
     print("=" * 50)
-    # Run hyperparam search for semi-supervised autoencoder
     best_s_model, best_s_config, best_s_score, s_results = semisupervised_ae_search(
         train_loader, val_loader, semi_ae_search_space
     )

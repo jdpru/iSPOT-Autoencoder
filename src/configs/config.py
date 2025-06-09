@@ -6,10 +6,10 @@ SEED = 42
 # Device configuration
 def get_device():
     if torch.cuda.is_available():
-        print("CUDA available, using GPU for training")
+        print("\n CUDA available, using GPU \n")
         return torch.device('cuda')
     else:
-        print("CUDA not available, using CPU for training")
+        print("\n CUDA not available, using CPU \n")
         return torch.device('cpu')
 
 DEVICE = get_device()

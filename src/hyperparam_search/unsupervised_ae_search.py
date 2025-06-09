@@ -4,8 +4,9 @@ from src.models import UnsupervisedAutoencoder
 from src.training.unsupervised_ae import train_unsupervised_autoencoder
 from src.data.data_utils import extract_latent_features
 from src.training.logreg import train_and_evaluate_logreg
+from src.configs import N_EPOCHS
 
-def unsupervised_ae_search(train_loader, val_loader, search_space, n_epochs):
+def unsupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_EPOCHS):
     """
     Runs grid search over the search_space and returns best model/config/score.
     
@@ -22,7 +23,10 @@ def unsupervised_ae_search(train_loader, val_loader, search_space, n_epochs):
     keys = list(search_space.keys())
     for values in itertools.product(*[search_space[k] for k in keys]):
         hyperparams = dict(zip(keys, values))
-        print(f"\nTrying hyperparams: {hyperparams}")
+        
+        print(f"\nTrying hyperparameters:")
+        for key, value in hyperparams.items():
+            print(f"  {key:15s}: {value}")
 
         model = UnsupervisedAutoencoder(
             latent_dim=hyperparams['latent_dim'],

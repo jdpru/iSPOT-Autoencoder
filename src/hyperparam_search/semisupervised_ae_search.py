@@ -4,8 +4,9 @@ from src.models import SemiSupervisedAutoencoder
 from src.training.semisupervised_ae import train_semisupervised_autoencoder
 from src.data.data_utils import extract_latent_features
 from src.training.logreg import train_and_evaluate_logreg
+from src.configs import N_EPOCHS
 
-def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs):
+def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_EPOCHS):
     """
     Runs grid search over the search_space and returns best model/config/score.
 

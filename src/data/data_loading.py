@@ -1,5 +1,11 @@
 import pandas as pd
 from src.configs import *
+from src.models.unsupervised_ae import UnsupervisedAutoencoder
+from src.models.semisupervised_ae import SemiSupervisedAutoencoder
+from src.models.semisupervised_rvae import SemiSupervisedRVAE
+import torch
+import json
+from src.utils import relative_path_str
 
 def load_train_test_data():
     """
@@ -63,7 +69,64 @@ def load_train_test_data():
             'patient_id': test_patient_ids
         }
     }
+
+def load_best_model_from_hyperparam_search(model_type):
+    """
+    Load the best model and config from hyperparameter search results.
     
+    Args:
+        model_type: One of 'unsupervised_ae', 'semisupervised_ae', 'semisupervised_rvae'
+    
+    Returns:
+        model: Loaded model with best hyperparameters
+        config: Best hyperparameter configuration
+    """
+    # Find the most recent config file for this model type
+    config_files = list(MODELS_DIR.glob(f"best_{model_type}_*_config.json"))
+    if not config_files:
+        raise FileNotFoundError(f"No saved model config found for {model_type}. "
+                              f"Please run hyperparameter search first.")
+    
+    # Get the most recent config file (by timestamp)
+    latest_config_file = max(config_files, key=lambda x: x.stat().st_mtime)
+    
+    # Load config
+    with open(latest_config_file, 'r') as f:
+        config_data = json.load(f)
+    
+    best_config = config_data['best_config']
+    model_filename = config_data['model_file']
+    model_path = MODELS_DIR / model_filename
+    
+    # Initialize model with best hyperparameters
+    if model_type == 'unsupervised_ae':
+        model = UnsupervisedAutoencoder(
+            latent_dim=best_config['latent_dim'],
+            dropout_rate=best_config['dropout_rate']
+        )
+    elif model_type == 'semisupervised_ae':
+        model = SemiSupervisedAutoencoder(
+            latent_dim=best_config['latent_dim'],
+            dropout_rate=best_config['dropout_rate']
+        )
+    elif model_type == 'semisupervised_rvae':
+        model = SemiSupervisedRVAE(
+            latent_dim=best_config['latent_dim']
+        )
+    else:
+        raise ValueError(f"Unknown model type: {model_type}")
+    
+    # Load trained weights
+    model.load_state_dict(torch.load(model_path, map_location=DEVICE))
+    model.to(DEVICE)
+    model.eval()
+    
+    print(f"✓ Loaded best {model_type} model from {relative_path_str(model_path)}")
+    print(f"  Best config: {best_config}")
+    print(f"  Validation score: {config_data['best_val_score']:.3f}")
+    
+    return model, best_config
+
 # def _check_eeg_normalization(eeg_data, dataset_name):
 #     """
 #     Check if EEG data is normalized per patient per electrode.
@@ -86,60 +149,3 @@ def load_train_test_data():
 #         raise ValueError(f"{dataset_name} EEG data is not normalized per patient per electrode! "
 #                         f"Mean of means: {np.mean(means):.6f}, Mean of stds: {np.mean(stds):.6f}")
 
-# def normalize_eeg_data():
-#     """
-#     Normalize train and test EEG data per patient per electrode.
-#     Overwrites the original HDF5 files.
-#     """
-#     with h5py.File(TRAIN_DATA_FILE, 'r+') as f:
-#         eeg_data = f['eeg_data'][:]
-        
-#         # Normalize per patient per electrode (across time axis)
-#         normalized_data = (eeg_data - np.mean(eeg_data, axis=2, keepdims=True)) / np.std(eeg_data, axis=2, keepdims=True)
-        
-#         # Overwrite the dataset
-#         del f['eeg_data']
-#         f['eeg_data'] = normalized_data
-        
-#         print(f"\n ✓✓✓ Train data normalized. ✓✓✓ \nMean: {np.mean(normalized_data):.3f}, STD: {np.std(normalized_data):.3f}, Shape: {normalized_data.shape}")
-    
-#     with h5py.File(TEST_DATA_FILE, 'r+') as f:
-#         eeg_data = f['eeg_data'][:]
-        
-#         # Normalize per patient per electrode (across time axis)
-#         normalized_data = (eeg_data - np.mean(eeg_data, axis=2, keepdims=True)) / np.std(eeg_data, axis=2, keepdims=True)
-        
-#         # Overwrite the dataset
-#         del f['eeg_data']
-#         f['eeg_data'] = normalized_data
-        
-#         print(f"\n ✓✓✓ Test data normalized. ✓✓✓ \nMean: {np.mean(normalized_data):.3f}, STD: {np.std(normalized_data):.3f}, Shape: {normalized_data.shape}")
-    
-# def _check_clinical_normalization(clinical_data, dataset_name):
-#     """
-#     Check if continuous clinical variables are normalized.
-#     For train: each feature should have mean≈0, std≈1
-#     For test: just check that data looks reasonable (no extreme values)
-
-#     Args:
-#         clinical_data (np.ndarray): Clinical data - shape (n_patients, n_features)
-#         dataset_name (str): Name of the dataset for logging (train or test).
-#     """
-#     if dataset_name.lower() == "train":
-#         # Train data: each feature should be normalized (mean≈0, std≈1)
-#         means = np.mean(clinical_data, axis=0)  # (n_features,)
-#         stds = np.std(clinical_data, axis=0)    # (n_features,)
-        
-#         if not (np.allclose(means, 0, atol=1e-6) and np.allclose(stds, 1, atol=1e-6)):
-#             raise ValueError(f"{dataset_name} clinical data is not normalized per feature! "
-#                             f"Mean of means: {np.mean(means):.6f}, Mean of stds: {np.mean(stds):.6f}")
-#     else:
-#         # Test data: just check for reasonable values (normalized with train stats)
-#         if np.any(np.abs(clinical_data) > 10):  # Flag extreme outliers
-#             print(f"Warning: {dataset_name} clinical data contains extreme values (>10 or <-10). "
-#                   f"Min: {np.min(clinical_data):.3f}, Max: {np.max(clinical_data):.3f}")
-        
-#         print(f"{dataset_name} clinical data stats - Mean: {np.mean(clinical_data):.3f}, "
-#               f"Std: {np.std(clinical_data):.3f}")
-    
-    

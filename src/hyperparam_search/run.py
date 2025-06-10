@@ -106,4 +106,5 @@ def save_best_model(model, config, score, model_type):
     return model_path, config_path
 
 if __name__ == "__main__":
+    setup()
     run_search()

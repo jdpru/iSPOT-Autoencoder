@@ -9,6 +9,7 @@ class UnsupervisedAutoencoder(nn.Module):
     def __init__(self, input_dim=AUTOENCODER_INPUT_DIM, latent_dim=LATENT_DIM, 
                  dropout_rate=DROPOUT_RATE):
         super().__init__()
+        self.name = 'UnsupervisedAutoencoder'
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 512),
             nn.ReLU(),

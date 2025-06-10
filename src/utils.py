@@ -21,12 +21,8 @@ def relative_path_str(path):
 
 def _create_directories():
     '''
-    Create directories for saving data and figures.
+    Create directories.
     The directories are created if they do not already exist.
     '''    
-    for drug in DRUG_IDS:
-        for target in TARGETS:
-            for directory in DIRECTORIES[1:]:  # Skip DATA_DIR
-                (directory / drug / target).mkdir(parents=True, exist_ok=True)
-    
-    DIRECTORIES[0].mkdir(parents=True, exist_ok=True)  # Ensure DATA_DIR exists
+    for directory in DIRECTORIES:
+        directory.mkdir(parents=True, exist_ok=True)  # Ensure DATA_DIR exists

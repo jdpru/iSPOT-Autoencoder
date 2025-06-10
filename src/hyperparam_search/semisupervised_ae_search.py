@@ -17,15 +17,24 @@ def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_
     - recon_weight: Weight for reconstruction loss
     - pred_weight: Weight for prediction loss
     """
+    n_configs = np.prod([len(v) for v in search_space.values()])
+    print("\n" + "=" * 50)
+    print("HYPERPARAMETER SEARCH: UNSUPERVISED AUTOENCODER")
+    print(f"Num configurations: {n_configs}")
+    print("=" * 50)
+
     best_score = -np.inf
     best_config = None
     best_model = None
     all_results = []
 
     keys = list(search_space.keys())
-    for values in itertools.product(*[search_space[k] for k in keys]):
+    for i, values in enumerate(itertools.product(*[search_space[k] for k in keys])):
         hyperparams = dict(zip(keys, values))
-        print(f"\nTrying hyperparams: {hyperparams}")
+    
+        print(f"\nConfiguration {i+1}/{n_configs}. Hyperparams:")
+        for key, value in hyperparams.items():
+            print(f"  {key:15s}: {value}")
 
         model = SemiSupervisedAutoencoder(
             latent_dim=hyperparams['latent_dim'],

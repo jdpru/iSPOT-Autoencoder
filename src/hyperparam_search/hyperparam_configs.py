@@ -31,8 +31,6 @@ unsup_rvae_search_space = {
 # For semi-supervised RVAE
 semi_rvae_search_space = {
     'latent_dim': [64, 128],
-    'hidden_size': [64, 128],
-    'latent_dim': [64, 128],
     'recon_weight': [0.1, 0.5, 1.0],
     'pred_weight': [0.1, 0.5, 1.0],
     'dropout_rate': [0.2, 0.4],

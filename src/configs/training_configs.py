@@ -8,6 +8,7 @@ VAL_FRAC = 0.2
 
 ##################### HYPERPARAMETERS #####################
 
+GRU_HIDDEN_SIZE = 128
 LATENT_DIM = 64
 RECONSTRUCTION_WEIGHT = 1.0
 PREDICTION_WEIGHT = 1.0

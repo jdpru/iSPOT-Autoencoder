@@ -5,6 +5,7 @@ from src.configs import *
 class SemiSupervisedAutoencoder(nn.Module):
     def __init__(self, input_dim=AUTOENCODER_INPUT_DIM, latent_dim=LATENT_DIM):
         super().__init__()
+        self.name = 'SemiSupervisedAutoencoder'
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 512),
             nn.ReLU(),
@@ -26,7 +27,6 @@ class SemiSupervisedAutoencoder(nn.Module):
         self.predictor = nn.Sequential(
             nn.Linear(latent_dim, 32),
             nn.ReLU(),
-            nn.Dropout(DROPOUT_RATE),
             nn.Linear(32, 1),
             nn.Sigmoid()
         )

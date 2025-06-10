@@ -3,7 +3,7 @@
 BATCH_SIZE = 32
 MIN_DELTA_TRAIN_LOSS = 0.0001
 N_CVFOLDS = 5
-N_EPOCHS = 50
+N_EPOCHS = 1000
 VAL_FRAC = 0.2
 
 ##################### HYPERPARAMETERS #####################

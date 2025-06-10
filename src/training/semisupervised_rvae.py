@@ -10,7 +10,7 @@ def kl_divergence(mu, log_sigma):
     kld = -0.5 * torch.sum(1 + 2*log_sigma - mu.pow(2) - sigma2, dim=1)
     return torch.mean(kld)
 
-def train_semisupervised_RVAE(model, train_loader, 
+def train_semisupervised_rvae(model, train_loader, 
                              n_epochs=N_EPOCHS, 
                              lr=LEARNING_RATE,
                              reconstruction_weight=RECONSTRUCTION_WEIGHT, 

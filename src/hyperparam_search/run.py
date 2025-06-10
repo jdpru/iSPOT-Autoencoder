@@ -23,18 +23,18 @@ def run_search():
     val_loader = make_eeg_dataloader_from_dict(val_dict, shuffle=False)
     
     ########### 1. Hyper param search : Unsupervised autoencoder ###########
-    best_model, best_config, best_score, all_results = unsupervised_ae_search(
-        train_loader, val_loader, unsup_ae_search_space
-    )
-    save_search_results(all_results, "unsupervised_ae")
-    save_best_model(best_model, best_config, best_score, "unsupervised_ae")
+    # best_model, best_config, best_score, all_results = unsupervised_ae_search(
+    #     train_loader, val_loader, unsup_ae_search_space
+    # )
+    # save_search_results(all_results, "unsupervised_ae")
+    # save_best_model(best_model, best_config, best_score, "unsupervised_ae")
     
-    ########### 2. Hyperparameter search: Semi-supervised autoencoder ###########
-    best_model, best_config, best_score, all_results = semisupervised_ae_search(
-        train_loader, val_loader, semi_ae_search_space
-    )
-    save_search_results(all_results, "semisupervised_ae")
-    save_best_model(best_model, best_config, best_score, "semisupervised_ae")
+    # ########### 2. Hyperparameter search: Semi-supervised autoencoder ###########
+    # best_model, best_config, best_score, all_results = semisupervised_ae_search(
+    #     train_loader, val_loader, semi_ae_search_space
+    # )
+    # save_search_results(all_results, "semisupervised_ae")
+    # save_best_model(best_model, best_config, best_score, "semisupervised_ae")
 
     ########### 3. Hyper param search : Semi-supervised RVAE ###########
     best_model, best_config, best_score, all_results = semisupervised_rvae_search(

@@ -1,7 +1,7 @@
 import itertools
 import numpy as np
-from src.models import SemiSupervisedAutoencoder
-from src.training.semisupervised_ae import train_semisupervised_autoencoder
+from src.models import SemiSupervisedRVAE
+from src.training.semisupervised_rvae import train_semisupervised_rvae
 from src.data.data_utils import extract_latent_features
 from src.training.logreg import train_and_evaluate_logreg
 from src.configs import N_EPOCHS
@@ -36,12 +36,12 @@ def semisupervised_rvae_search(train_loader, val_loader, search_space, n_epochs=
         for key, value in hyperparams.items():
             print(f"  {key:15s}: {value}")
 
-        model = SemiSupervisedAutoencoder(
-            latent_dim=hyperparams['latent_dim'],
-            dropout_rate=hyperparams['dropout_rate']
+        model = SemiSupervisedRVAE(
+            latent_dim=hyperparams['latent_dim']
         )
-        model = train_semisupervised_autoencoder(
-            model, train_loader,
+        model = train_semisupervised_rvae(
+            model,
+            train_loader,
             n_epochs=n_epochs,
             lr=hyperparams['lr'],
             reconstruction_weight=hyperparams['recon_weight'],

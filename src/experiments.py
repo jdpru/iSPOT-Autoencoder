@@ -199,12 +199,9 @@ def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
     )
     
     # 4. Semi-supervised RVAE EEG features
-    try:
-        results['semisupervised_rvae'] = run_semisupervised_rvae_experiment(
+    results['semisupervised_rvae'] = run_semisupervised_rvae_experiment(
             train_eeg_dataloader, test_eeg_dataloader
-        )
-    except FileNotFoundError as e:
-        print(f"Skipping RVAE experiment: {e}")
+    )
     
     # 5. Unsupervised autoencoder EEG + clinical features
     results['unsupervised_ae_clinical'] = run_unsupervised_ae_plus_clinical_experiment(
@@ -219,13 +216,10 @@ def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
     )
     
     # 7. Semi-supervised RVAE EEG + clinical features
-    try:
-        results['semisupervised_rvae_clinical'] = run_semisupervised_rvae_plus_clinical_experiment(
-            train_eeg_dataloader, test_eeg_dataloader, 
-            train_clinical_data, test_clinical_data
-        )
-    except FileNotFoundError as e:
-        print(f"Skipping RVAE + clinical experiment: {e}")
+    results['semisupervised_rvae_clinical'] = run_semisupervised_rvae_plus_clinical_experiment(
+        train_eeg_dataloader, test_eeg_dataloader, 
+        train_clinical_data, test_clinical_data
+    )
     
     return results
 

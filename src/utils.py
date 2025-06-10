@@ -6,7 +6,6 @@ import pandas as pd
 import pickle
 import shelve
 import torch
-import h5py
 
 def setup():
     np.random.seed(SEED)

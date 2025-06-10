@@ -51,13 +51,12 @@ def semisupervised_rvae_search(train_loader, val_loader, search_space, n_epochs=
         train_X, train_y, patient_ids = extract_latent_features(model, train_loader)
         val_X, val_y, patient_ids = extract_latent_features(model, val_loader)
 
-        _, acc, roc_auc = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
+        _, roc_auc = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
 
         all_results.append({'hyperparams': hyperparams, 'val_roc_auc': roc_auc, 'val_acc': acc})
 
         if roc_auc > best_score:
             best_score = roc_auc
-            best_acc = acc
             best_config = hyperparams
             best_model = model
 
@@ -65,6 +64,5 @@ def semisupervised_rvae_search(train_loader, val_loader, search_space, n_epochs=
     for key, value in best_config.items():
         print(f"  {key:15s}: {value}")
     print(f"Validation ROC-AUC: {best_score:.3f}")
-    print(f"Validation accuracy: {best_acc:.3f}")
 
-    return best_model, best_config, best_score, best_acc, all_results
+    return best_model, best_config, best_score, all_results

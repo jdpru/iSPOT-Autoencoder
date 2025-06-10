@@ -13,7 +13,7 @@ def train_unsupervised_autoencoder(model, train_loader, n_epochs=N_EPOCHS, lr=LE
     for epoch in range(n_epochs):
         total_loss = 0
         for batch in train_loader:
-            eeg_data = batch['eeg']
+            eeg_data = batch['eeg'].to(DEVICE)
             
             optimizer.zero_grad()
             reconstruction, latent = model(eeg_data)

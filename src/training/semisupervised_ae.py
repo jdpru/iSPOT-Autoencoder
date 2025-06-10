@@ -22,7 +22,7 @@ def train_semisupervised_autoencoder(model, train_loader,
         
         for batch in train_loader:
             eeg_data = batch['eeg'].to(DEVICE)
-            response = batch['response'].unsqueeze(1)  # Shape: (batch_size, 1)
+            response = batch['response'].to(DEVICE).unsqueeze(1)  # Shape: (batch_size, 1)
             
             optimizer.zero_grad()
             reconstruction, prediction, latent = model(eeg_data)

@@ -11,8 +11,17 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 
 def plot_confusion_matrix(y_pred, y_true, title, filename):
     """
-    Plot a confusion matrix for binary classification. 
+    Plot a well-labeled confusion matrix for binary classification.
+    
+    Args:
+        y_pred: Predicted labels (0/1)
+        y_true: True labels (0/1) 
+        title: Title for the plot
+        save_name: Optional filename to save (without extension)
     """
+    from sklearn.metrics import confusion_matrix, accuracy_score
+    import matplotlib.pyplot as plt
+    import seaborn as sns
     
     # Calculate confusion matrix and metrics
     cm = confusion_matrix(y_true, y_pred)
@@ -37,12 +46,6 @@ def plot_confusion_matrix(y_pred, y_true, title, filename):
     plt.ylabel('True Label', fontsize=12, fontweight='bold')
     plt.title(f'{title}\nAccuracy: {accuracy:.3f} | Sensitivity: {sensitivity:.3f} | Specificity: {specificity:.3f}', 
               fontsize=12, pad=20)
-    
-    # Add count labels in each cell for clarity
-    plt.text(0.5, 0.2, f'True Negatives\n{tn}', ha='center', va='center', fontweight='bold')
-    plt.text(1.5, 0.2, f'False Positives\n{fp}', ha='center', va='center', fontweight='bold')  
-    plt.text(0.5, 1.2, f'False Negatives\n{fn}', ha='center', va='center', fontweight='bold')
-    plt.text(1.5, 1.2, f'True Positives\n{tp}', ha='center', va='center', fontweight='bold')
     
     save_path = FIGURES_DIR / f"{filename}.png"
     save_figure(save_path)

@@ -6,6 +6,7 @@ from src.data import extract_latent_features, load_best_model_from_hyperparam_se
 from src.training import *
 from src.utils import *
 from src.plotting import plot_confusion_matrix
+import pickle
 
 def run_clinical_only_experiment(train_clinical_data, test_clinical_data, train_y, test_y):
     """Run logistic regression on clinical features only"""
@@ -38,8 +39,15 @@ def run_unsupervised_ae_experiment(train_loader, test_loader):
     lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
+
+    latent_features_info = {
+        'train_X': train_X,
+        'train_y': train_y,
+        'test_X': test_X,
+        'test_y': test_y,
+    }
     
-    return model, lr_model, roc_auc, test_predictions
+    return model, lr_model, roc_auc, test_predictions, latent_features_info
 
 def run_semisupervised_experiment(train_loader, test_loader):
     """Run semi-supervised autoencoder experiment with pre-trained model"""
@@ -60,8 +68,15 @@ def run_semisupervised_experiment(train_loader, test_loader):
     lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
+
+    latent_features_info = {
+        'train_X': train_X,
+        'train_y': train_y,
+        'test_X': test_X,
+        'test_y': test_y,
+    }
     
-    return model, lr_model, roc_auc, test_predictions
+    return model, lr_model, roc_auc, test_predictions, latent_features_info
 
 def run_semisupervised_rvae_experiment(train_loader, test_loader):
     """Run semi-supervised RVAE experiment with pre-trained model"""
@@ -82,8 +97,15 @@ def run_semisupervised_rvae_experiment(train_loader, test_loader):
     lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
+
+    latent_features_info = {
+        'train_X': train_X,
+        'train_y': train_y,
+        'test_X': test_X,
+        'test_y': test_y,
+    }
     
-    return model, lr_model, roc_auc, test_predictions
+    return model, lr_model, roc_auc, test_predictions, latent_features_info
 
 def run_unsupervised_ae_plus_clinical_experiment(train_loader, test_loader, 
                                                train_clinical_data, test_clinical_data):
@@ -172,6 +194,9 @@ def run_semisupervised_rvae_plus_clinical_experiment(train_loader, test_loader,
 def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
     """Run all experimental pipelines using pre-trained models and return results"""
     
+    # Initialize big list to store: train_X, test_X, train_y, test_y for each experiment
+    latent_features = {}
+
     # Extract data components
     train_clinical_data = data['train']['clinical_data']
     test_clinical_data = data['test']['clinical_data']
@@ -189,26 +214,28 @@ def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
         train_clinical_data, test_clinical_data, train_y, test_y
     )
     plot_confusion_matrix(results['clinical_only'][-1], test_y, "Clinical Only", "clinical_cm")
-
     
     ######### 2. Unsupervised autoencoder EEG features ########
     results['unsupervised_ae'] = run_unsupervised_ae_experiment(
         train_eeg_dataloader, test_eeg_dataloader
     )
-    plot_confusion_matrix(results['unsupervised_ae'][-1], test_y, "Unsupervised Vanilla Autoencoder", "unsup_ae_cm")
-    
+    plot_confusion_matrix(results['unsupervised_ae'][-2], test_y, "Unsupervised Vanilla Autoencoder", "unsup_ae_cm")
+    latent_features['unsupervised_ae'] = results['unsupervised_ae'][-1]
+
     ######### 3. Semi-supervised autoencoder EEG features ########
     results['semisupervised_ae'] = run_semisupervised_experiment(
         train_eeg_dataloader, test_eeg_dataloader
     )
-    plot_confusion_matrix(results['semisupervised_ae'][-1], test_y, "Semi-Supervised Autoencoder", "semisup_ae_cm")
-    
+    plot_confusion_matrix(results['semisupervised_ae'][-2], test_y, "Semi-Supervised Autoencoder", "semisup_ae_cm")
+    latent_features['semisupervised_ae'] = results['semisupervised_ae'][-1]
+
     ######### 4. Semi-supervised RVAE EEG features ########
     results['semisupervised_rvae'] = run_semisupervised_rvae_experiment(
             train_eeg_dataloader, test_eeg_dataloader
     )
-    plot_confusion_matrix(results['semisupervised_rvae'][-1], test_y, "Semi-Supervised RVAE", "semisup_rvae_cm")
-    
+    plot_confusion_matrix(results['semisupervised_rvae'][-2], test_y, "Semi-Supervised RVAE", "semisup_rvae_cm")
+    latent_features['semisupervised_rvae'] = results['semisupervised_rvae'][-1]
+
     ######### 5. Unsupervised autoencoder EEG + clinical features ########
     results['unsupervised_ae_clinical'] = run_unsupervised_ae_plus_clinical_experiment(
         train_eeg_dataloader, test_eeg_dataloader, 
@@ -233,6 +260,12 @@ def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
     plot_confusion_matrix(results['semisupervised_rvae_clinical'][-1], test_y,
                           "Semi-Supervised RVAE + Clinical Features", "semisup_rvae_clinical_cm")
     
+    # pickle latent features dict 
+    save_path = DATA_DIR / "latent_features_dict.pkl"
+    with open(save_path, 'wb') as f:
+        pickle.dump(latent_features, f)
+        print(f"\nLatent features saved to {relative_path_str(save_path)}\n")
+
     return results
 
 def print_experiment_summary(results):

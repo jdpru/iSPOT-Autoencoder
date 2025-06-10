@@ -18,7 +18,7 @@ def unsupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_EP
     """
     n_configs = np.prod([len(v) for v in search_space.values()])
     print("\n" + "=" * 50)
-    print("HYPERPARAMETER SEARCH: UNSUPERVISED AUTOENCODER")
+    print("HYPERPARAMETER SEARCH: UNSUPERVISED VANILLA AUTOENCODER")
     print(f"Num configurations: {n_configs}")
     print("=" * 50)
     

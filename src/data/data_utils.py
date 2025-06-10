@@ -19,6 +19,7 @@ def extract_latent_features(model, data_loader):
         patient_ids: List of patient IDs
     """
     model.eval()
+    model.to(DEVICE)
     latent_features = []
     responses = []
     patient_ids = []

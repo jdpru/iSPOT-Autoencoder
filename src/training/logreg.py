@@ -20,4 +20,4 @@ def train_and_evaluate_logreg(train_features, test_features, train_labels,
     print(f"\nLogistic Regression Results:")
     print(f"Test Accuracy: {test_accuracy:.3f}, ROC-AUC Score: {roc_auc:.3f}")
     
-    return lr_model, roc_auc
+    return lr_model, roc_auc, test_predictions

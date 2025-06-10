@@ -5,6 +5,7 @@ from src.models.semisupervised_ae import SemiSupervisedAutoencoder
 from src.data import extract_latent_features, load_best_model_from_hyperparam_search
 from src.training import *
 from src.utils import *
+from src.plotting import plot_confusion_matrix
 
 def run_clinical_only_experiment(train_clinical_data, test_clinical_data, train_y, test_y):
     """Run logistic regression on clinical features only"""
@@ -12,11 +13,11 @@ def run_clinical_only_experiment(train_clinical_data, test_clinical_data, train_
     print("CLINICAL FEATURES ONLY EXPERIMENT")
     print("=" * 50)
     
-    lr_model, roc_auc = train_and_evaluate_logreg(
+    lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_clinical_data, test_clinical_data, train_y, test_y
     )
     
-    return lr_model, roc_auc
+    return lr_model, roc_auc, test_predictions
 
 def run_unsupervised_ae_experiment(train_loader, test_loader):
     """Run unsupervised autoencoder experiment with pre-trained model"""
@@ -34,11 +35,11 @@ def run_unsupervised_ae_experiment(train_loader, test_loader):
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, roc_auc = train_and_evaluate_logreg(
+    lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
     
-    return model, lr_model, roc_auc
+    return model, lr_model, roc_auc, test_predictions
 
 def run_semisupervised_experiment(train_loader, test_loader):
     """Run semi-supervised autoencoder experiment with pre-trained model"""
@@ -56,11 +57,11 @@ def run_semisupervised_experiment(train_loader, test_loader):
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, roc_auc = train_and_evaluate_logreg(
+    lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
     
-    return model, lr_model, roc_auc
+    return model, lr_model, roc_auc, test_predictions
 
 def run_semisupervised_rvae_experiment(train_loader, test_loader):
     """Run semi-supervised RVAE experiment with pre-trained model"""
@@ -78,11 +79,11 @@ def run_semisupervised_rvae_experiment(train_loader, test_loader):
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, roc_auc = train_and_evaluate_logreg(
+    lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
     
-    return model, lr_model, roc_auc
+    return model, lr_model, roc_auc, test_predictions
 
 def run_unsupervised_ae_plus_clinical_experiment(train_loader, test_loader, 
                                                train_clinical_data, test_clinical_data):
@@ -106,11 +107,11 @@ def run_unsupervised_ae_plus_clinical_experiment(train_loader, test_loader,
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, roc_auc = train_and_evaluate_logreg(
+    lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_combined, test_combined, train_y, test_y
     )
     
-    return model, lr_model, roc_auc
+    return model, lr_model, roc_auc, test_predictions
 
 def run_semisupervised_plus_clinical_experiment(train_loader, test_loader, 
                                               train_clinical_data, test_clinical_data):
@@ -134,11 +135,11 @@ def run_semisupervised_plus_clinical_experiment(train_loader, test_loader,
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, roc_auc = train_and_evaluate_logreg(
+    lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_combined, test_combined, train_y, test_y
     )
     
-    return model, lr_model, roc_auc
+    return model, lr_model, roc_auc, test_predictions
 
 def run_semisupervised_rvae_plus_clinical_experiment(train_loader, test_loader, 
                                                    train_clinical_data, test_clinical_data):
@@ -162,11 +163,11 @@ def run_semisupervised_rvae_plus_clinical_experiment(train_loader, test_loader,
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, roc_auc = train_and_evaluate_logreg(
+    lr_model, roc_auc, test_predictions = train_and_evaluate_logreg(
         train_combined, test_combined, train_y, test_y
     )
     
-    return model, lr_model, roc_auc
+    return model, lr_model, roc_auc, test_predictions
 
 def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
     """Run all experimental pipelines using pre-trained models and return results"""
@@ -183,43 +184,54 @@ def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
     print("RUNNING ALL EXPERIMENTS WITH PRE-TRAINED MODELS")
     print("=" * 60)
     
-    # 1. Clinical features only (no pre-trained model needed)
+    ######## 1. Clinical features only (no pre-trained model needed) ########
     results['clinical_only'] = run_clinical_only_experiment(
         train_clinical_data, test_clinical_data, train_y, test_y
     )
+    plot_confusion_matrix(results['clinical_only'][-1], test_y, "Clinical Only", "clinical_cm")
+
     
-    # 2. Unsupervised autoencoder EEG features
+    ######### 2. Unsupervised autoencoder EEG features ########
     results['unsupervised_ae'] = run_unsupervised_ae_experiment(
         train_eeg_dataloader, test_eeg_dataloader
     )
+    plot_confusion_matrix(results['unsupervised_ae'][-1], test_y, "Unsupervised Vanilla Autoencoder", "unsup_ae_cm")
     
-    # 3. Semi-supervised autoencoder EEG features
+    ######### 3. Semi-supervised autoencoder EEG features ########
     results['semisupervised_ae'] = run_semisupervised_experiment(
         train_eeg_dataloader, test_eeg_dataloader
     )
+    plot_confusion_matrix(results['semisupervised_ae'][-1], test_y, "Semi-Supervised Autoencoder", "semisup_ae_cm")
     
-    # 4. Semi-supervised RVAE EEG features
+    ######### 4. Semi-supervised RVAE EEG features ########
     results['semisupervised_rvae'] = run_semisupervised_rvae_experiment(
             train_eeg_dataloader, test_eeg_dataloader
     )
+    plot_confusion_matrix(results['semisupervised_rvae'][-1], test_y, "Semi-Supervised RVAE", "semisup_rvae_cm")
     
-    # 5. Unsupervised autoencoder EEG + clinical features
+    ######### 5. Unsupervised autoencoder EEG + clinical features ########
     results['unsupervised_ae_clinical'] = run_unsupervised_ae_plus_clinical_experiment(
         train_eeg_dataloader, test_eeg_dataloader, 
         train_clinical_data, test_clinical_data
     )
+    plot_confusion_matrix(results['unsupervised_ae_clinical'][-1], test_y,
+                          "Unsupervised Autoencoder + Clinical Features", "unsup_ae_clinical_cm")
     
-    # 6. Semi-supervised autoencoder EEG + clinical features
+    ######### 6. Semi-supervised autoencoder EEG + clinical features ########
     results['semisupervised_ae_clinical'] = run_semisupervised_plus_clinical_experiment(
         train_eeg_dataloader, test_eeg_dataloader, 
         train_clinical_data, test_clinical_data
     )
+    plot_confusion_matrix(results['semisupervised_ae_clinical'][-1], test_y,
+                          "Semi-Supervised Autoencoder + Clinical Features", "semisup_ae_clinical_cm")
     
     # 7. Semi-supervised RVAE EEG + clinical features
     results['semisupervised_rvae_clinical'] = run_semisupervised_rvae_plus_clinical_experiment(
         train_eeg_dataloader, test_eeg_dataloader, 
         train_clinical_data, test_clinical_data
     )
+    plot_confusion_matrix(results['semisupervised_rvae_clinical'][-1], test_y,
+                          "Semi-Supervised RVAE + Clinical Features", "semisup_rvae_clinical_cm")
     
     return results
 

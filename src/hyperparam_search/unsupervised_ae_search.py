@@ -43,20 +43,19 @@ def unsupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_EP
             model, train_loader, n_epochs=n_epochs, lr=hyperparams['lr']
         )
 
-        train_X, train_y = extract_latent_features(model, train_loader)
-        val_X, val_y = extract_latent_features(model, val_loader)
+        train_X, train_y, patient_ids = extract_latent_features(model, train_loader)
+        val_X, val_y, patient_ids = extract_latent_features(model, val_loader)
 
-        _, val_preds = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
-        acc = accuracy_score(val_y, val_preds)
-        roc_auc = roc_auc_score(val_y, val_preds)
-        print(f"Validation ACC: {acc:.3f}, ROC AUC: {roc_auc:.3f}")
+        _, roc_auc = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
 
-        all_results.append({'hyperparams': hyperparams, 'val_acc': acc})
+        all_results.append({'hyperparams': hyperparams, 'val_roc_auc': roc_auc})
 
-        if acc > best_score:
-            best_score = acc
+        if roc_auc > best_score:
+            best_score = roc_auc
             best_config = hyperparams
             best_model = model
 
-    print(f"\nBest hyperparams: {best_config} (val acc={best_score:.3f})")
+    print(f"\nBest hyperparameters: {best_config}")
+    print(f"Validation ROC-AUC: {best_score:.3f}")
+    
     return best_model, best_config, best_score, all_results

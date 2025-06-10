@@ -26,9 +26,6 @@ def train_semisupervised_autoencoder(model, train_loader,
             
             optimizer.zero_grad()
             reconstruction, prediction, latent = model(eeg_data)
-            print(f"Reconstruction shape: {reconstruction.shape}, "
-                  f"Prediction shape: {prediction.shape}, "
-                  f"Latent shape: {latent.shape}")
             
             # Two losses
             recon_loss = reconstruction_criterion(reconstruction, eeg_data)

@@ -1,24 +1,23 @@
 import torch
 import torch.nn as nn
-from src.configs import hidden_size, LATENT_DIM, N_ELECTRODES
-
-# TO-DO: Make sure this matches the other model configs
+from src.configs import GRU_HIDDEN_SIZE, LATENT_DIM, AUTOENCODER_INPUT_DIM, DEVICE
 
 class SemiSupervisedRVAE(nn.Module):
-    def __init__(self):
+    def __init__(self, input_dim=AUTOENCODER_INPUT_DIM, latent_dim=LATENT_DIM):
         super().__init__()
-        self.encoder_gru = nn.GRU(input_size=N_ELECTRODES,
-                                  hidden_size=hidden_size,
+        self.name = 'SemiSupervisedRVAE'
+        self.encoder_gru = nn.GRU(input_size=input_dim,
+                                  hidden_size=GRU_HIDDEN_SIZE,
                                   batch_first=True)
-        self.fc_mu      = nn.Linear(hidden_size, LATENT_DIM)
-        self.fc_logsig = nn.Linear(hidden_size, LATENT_DIM)
-        self.fc_dec_init = nn.Linear(LATENT_DIM, hidden_size)
-        self.decoder_gru = nn.GRU(input_size=N_ELECTRODES,
-                                  hidden_size=hidden_size,
+        self.fc_mu      = nn.Linear(GRU_HIDDEN_SIZE, latent_dim)
+        self.fc_logsig = nn.Linear(GRU_HIDDEN_SIZE, latent_dim)
+        self.fc_dec_init = nn.Linear(latent_dim, GRU_HIDDEN_SIZE)
+        self.decoder_gru = nn.GRU(input_size=input_dim,
+                                  hidden_size=GRU_HIDDEN_SIZE,
                                   batch_first=True)
-        self.fc_recon = nn.Linear(hidden_size, N_ELECTRODES)
-        self.classifier = nn.Sequential(
-            nn.Linear(LATENT_DIM, 32),
+        self.fc_recon = nn.Linear(GRU_HIDDEN_SIZE, input_dim)
+        self.predictor = nn.Sequential(
+            nn.Linear(latent_dim, 32),
             nn.ReLU(),
             nn.Linear(32, 1),
             nn.Sigmoid()
@@ -30,14 +29,20 @@ class SemiSupervisedRVAE(nn.Module):
         return mu + sigma * eps
 
     def forward(self, x):
+        # x: [batch, time_steps, n_channels]
         _, h = self.encoder_gru(x)
         h = h.squeeze(0)
         mu = self.fc_mu(h)
         log_sigma = self.fc_logsig(h)
         z = self.reparameterize(mu, log_sigma)
+        # Decode sequence
         h_dec_init = torch.tanh(self.fc_dec_init(z)).unsqueeze(0)
         dec_input = torch.zeros_like(x)
         dec_out, _ = self.decoder_gru(dec_input, h_dec_init)
-        recon = self.fc_recon(dec_out)
-        pred  = self.classifier(z)
+        # project each timestep
+        recon_seq = self.fc_recon_step(dec_out)  # [batch, time_steps, n_channels]
+
+        batch = recon_seq.size(0)
+        recon = recon_seq.view(batch, -1)       # [batch, input_dim]
+        pred = self.classifier(z)               # [batch,1]
         return recon, pred, mu, log_sigma

@@ -4,7 +4,8 @@ from datetime import datetime
 from src.data import train_val_split, make_eeg_dataloader_from_dict
 from src.hyperparam_search.unsupervised_ae_search import unsupervised_ae_search
 from src.hyperparam_search.semisupervised_ae_search import semisupervised_ae_search
-from src.hyperparam_search.hyperparam_configs import unsup_ae_search_space, semi_ae_search_space
+from src.hyperparam_search.semisupervised_rvae_search import semisupervised_rvae_search
+from src.hyperparam_search.hyperparam_configs import *
 from src.data import load_train_test_data
 from src.configs import  MODELS_DIR, HYPERPARAM_RESULTS_DIR
 from src.utils import relative_path_str
@@ -21,24 +22,28 @@ def run_search():
     train_loader = make_eeg_dataloader_from_dict(train_dict)
     val_loader = make_eeg_dataloader_from_dict(val_dict, shuffle=False)
     
-    # 1. Hyper param search : Unsupervised autoencoder
-    best_u_model, best_u_config, best_u_score, u_results = unsupervised_ae_search(
+    ########### 1. Hyper param search : Unsupervised autoencoder ###########
+    best_model, best_config, best_score, all_results = unsupervised_ae_search(
         train_loader, val_loader, unsup_ae_search_space
     )
-    save_search_results(u_results, "unsupervised_ae")
-    save_best_model(best_u_model, best_u_config, best_u_score, "unsupervised_ae")
+    save_search_results(all_results, "unsupervised_ae")
+    save_best_model(best_model, best_config, best_score, "unsupervised_ae")
     
-    # 2. Hyperparameter search: Semi-supervised autoencoder
-    best_s_model, best_s_config, best_s_score, s_results = semisupervised_ae_search(
+    ########### 2. Hyperparameter search: Semi-supervised autoencoder ###########
+    best_model, best_config, best_score, all_results = semisupervised_ae_search(
         train_loader, val_loader, semi_ae_search_space
     )
-    save_search_results(s_results, "semisupervised_ae")
-    save_best_model(best_s_model, best_s_config, best_s_score, "semisupervised_ae")
+    save_search_results(all_results, "semisupervised_ae")
+    save_best_model(best_model, best_config, best_score, "semisupervised_ae")
 
-    # 3. Hyper param search : Semi-supervised RVAE
-    # TO-DO: Implement semi-supervised RVAE search
+    ########### 3. Hyper param search : Semi-supervised RVAE ###########
+    best_model, best_config, best_score, all_results = semisupervised_rvae_search(
+        train_loader, val_loader, semi_rvae_search_space
+    )
+    save_search_results(all_results, "semisupervised_rvae")
+    save_best_model(best_model, best_config, best_score, "semisupervised_rvae")
 
-    # 4. Hyper param search: Unsupervised RVAE
+    ########### 4. Hyper param search: Unsupervised RVAE ###########
     # TO-DO
 
 def save_search_results(results, model_type):
@@ -52,8 +57,7 @@ def save_search_results(results, model_type):
     for result in results:
         json_result = {
             'hyperparams': result['hyperparams'],
-            'val_acc': float(result['val_acc']),
-            'val_roc_auc': float(result.get('val_roc_auc', 0))  # Add ROC-AUC if available
+            'val_roc_auc': float(result.get('val_roc_auc', 0))
         }
         json_results.append(json_result)
     

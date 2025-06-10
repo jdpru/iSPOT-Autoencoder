@@ -12,11 +12,11 @@ def run_clinical_only_experiment(train_clinical_data, test_clinical_data, train_
     print("CLINICAL FEATURES ONLY EXPERIMENT")
     print("=" * 50)
     
-    lr_model, predictions = train_and_evaluate_logreg(
+    lr_model, roc_auc = train_and_evaluate_logreg(
         train_clinical_data, test_clinical_data, train_y, test_y
     )
     
-    return lr_model, predictions
+    return lr_model, roc_auc
 
 def run_unsupervised_ae_experiment(train_loader, test_loader):
     """Run baseline unsupervised autoencoder experiment"""
@@ -36,11 +36,11 @@ def run_unsupervised_ae_experiment(train_loader, test_loader):
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, predictions = train_and_evaluate_logreg(
+    lr_model, roc_auc = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
     
-    return model, lr_model, predictions, (train_X, test_X)
+    return model, lr_model, roc_auc
 
 def run_semisupervised_experiment(train_loader, test_loader):
     """Run semi-supervised autoencoder experiment"""
@@ -64,11 +64,11 @@ def run_semisupervised_experiment(train_loader, test_loader):
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, predictions = train_and_evaluate_logreg(
+    lr_model, roc_auc = train_and_evaluate_logreg(
         train_X, test_X, train_y, test_y
     )
     
-    return model, lr_model, predictions, (train_X, test_X)
+    return model, lr_model, roc_auc
 
 def run_unsupervised_ae_plus_clinical_experiment(train_loader, test_loader, 
                                                train_clinical_data, test_clinical_data):
@@ -94,11 +94,11 @@ def run_unsupervised_ae_plus_clinical_experiment(train_loader, test_loader,
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, predictions = train_and_evaluate_logreg(
+    lr_model, roc_auc = train_and_evaluate_logreg(
         train_combined, test_combined, train_y, test_y
     )
     
-    return model, lr_model, predictions
+    return model, lr_model, roc_auc
 
 def run_semisupervised_plus_clinical_experiment(train_loader, test_loader, 
                                               train_clinical_data, test_clinical_data):
@@ -128,11 +128,11 @@ def run_semisupervised_plus_clinical_experiment(train_loader, test_loader,
     
     # Train and evaluate logistic regression
     print("Training and evaluating logistic regression...")
-    lr_model, predictions = train_and_evaluate_logreg(
+    lr_model, roc_auc = train_and_evaluate_logreg(
         train_combined, test_combined, train_y, test_y
     )
     
-    return model, lr_model, predictions
+    return model, lr_model, roc_auc
 
 def run_all_experiments(data, train_eeg_dataloader, test_eeg_dataloader):
     """Run all experimental pipelines and return results"""

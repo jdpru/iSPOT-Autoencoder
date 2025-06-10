@@ -6,9 +6,9 @@ from src.data.data_utils import extract_latent_features
 from src.training.logreg import train_and_evaluate_logreg
 from src.configs import N_EPOCHS
 
-def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_EPOCHS):
+def semisupervised_rvae_search(train_loader, val_loader, search_space, n_epochs=N_EPOCHS):
     """
-    Runs grid search over the search_space and returns best model/config/score.
+    Runs grid search over the search_space and returns best model/config/ROC-AUC score.
 
     Hyperparameters:
     - latent_dim: Dimension of the latent space
@@ -19,8 +19,8 @@ def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_
     """
     n_configs = np.prod([len(v) for v in search_space.values()])
     print("\n" + "=" * 50)
-    print("HYPERPARAMETER SEARCH: UNSUPERVISED AUTOENCODER")
-    print(f"Num configurations: {n_configs}")
+    print("HYPERPARAMETER SEARCH: SEMI-SUPERVISED RVAE")
+    print(f"Configurations to test: {n_configs}")
     print("=" * 50)
 
     best_score = -np.inf
@@ -32,7 +32,7 @@ def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_
     for i, values in enumerate(itertools.product(*[search_space[k] for k in keys])):
         hyperparams = dict(zip(keys, values))
     
-        print(f"\nConfiguration {i+1}/{n_configs}. Hyperparams:")
+        print(f"\nConfiguration {i+1}/{n_configs}:")
         for key, value in hyperparams.items():
             print(f"  {key:15s}: {value}")
 
@@ -51,16 +51,20 @@ def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_
         train_X, train_y, patient_ids = extract_latent_features(model, train_loader)
         val_X, val_y, patient_ids = extract_latent_features(model, val_loader)
 
-        _, roc_auc = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
+        _, acc, roc_auc = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
 
-        all_results.append({'hyperparams': hyperparams, 'val_roc_auc': roc_auc})
+        all_results.append({'hyperparams': hyperparams, 'val_roc_auc': roc_auc, 'val_acc': acc})
 
         if roc_auc > best_score:
             best_score = roc_auc
+            best_acc = acc
             best_config = hyperparams
             best_model = model
 
-    print(f"\nBest hyperparameters: {best_config}")
+    print(f"\nBest hyperparameters found:")
+    for key, value in best_config.items():
+        print(f"  {key:15s}: {value}")
     print(f"Validation ROC-AUC: {best_score:.3f}")
+    print(f"Validation accuracy: {best_acc:.3f}")
 
-    return best_model, best_config, best_score, all_results
+    return best_model, best_config, best_score, best_acc, all_results

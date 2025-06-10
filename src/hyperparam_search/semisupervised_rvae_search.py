@@ -53,7 +53,7 @@ def semisupervised_rvae_search(train_loader, val_loader, search_space, n_epochs=
 
         _, roc_auc = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
 
-        all_results.append({'hyperparams': hyperparams, 'val_roc_auc': roc_auc, 'val_acc': acc})
+        all_results.append({'hyperparams': hyperparams, 'val_roc_auc': roc_auc})
 
         if roc_auc > best_score:
             best_score = roc_auc

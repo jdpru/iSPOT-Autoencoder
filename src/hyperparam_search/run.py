@@ -9,6 +9,7 @@ from src.hyperparam_search.hyperparam_configs import *
 from src.data import load_train_test_data
 from src.configs import  MODELS_DIR, HYPERPARAM_RESULTS_DIR
 from src.utils import relative_path_str, setup
+
 def run_search():
     # Load data
     all_data = load_train_test_data()

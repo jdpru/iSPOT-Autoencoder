@@ -1,5 +1,5 @@
 # My ignores
-data/
+/data/
 figures/
 /models/
 .DS_Store

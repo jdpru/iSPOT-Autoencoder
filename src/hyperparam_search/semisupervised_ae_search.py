@@ -51,7 +51,7 @@ def semisupervised_ae_search(train_loader, val_loader, search_space, n_epochs=N_
         train_X, train_y, patient_ids = extract_latent_features(model, train_loader)
         val_X, val_y, patient_ids = extract_latent_features(model, val_loader)
 
-        _, roc_auc = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
+        _, roc_auc, y_pred = train_and_evaluate_logreg(train_X, val_X, train_y, val_y)
 
         all_results.append({'hyperparams': hyperparams, 'val_roc_auc': roc_auc})
 

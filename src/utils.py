@@ -25,3 +25,21 @@ def _create_directories():
     '''    
     for directory in DIRECTORIES:
         directory.mkdir(parents=True, exist_ok=True)  # Ensure DATA_DIR exists
+
+def l1_penalty(model, l1_weight, encoder_only=True):
+    """
+    Calculate L1 penalty for the model's parameters.
+    If encoder_only is True, only apply to encoder parameters.
+    """
+    l1_penalty = 0.0
+
+    if encoder_only and hasattr(model, 'encoder'):
+            parameters = model.encoder.parameters()
+    else:
+        parameters = model.parameters()
+    
+    for param in parameters:
+        if param.requires_grad:
+            l1_penalty += torch.sum(torch.abs(param))
+    
+    return l1_weight * l1_penalty

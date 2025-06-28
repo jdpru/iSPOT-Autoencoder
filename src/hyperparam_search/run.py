@@ -10,40 +10,41 @@ from src.data import load_train_test_data
 from src.configs import  MODELS_DIR, HYPERPARAM_RESULTS_DIR
 from src.utils import relative_path_str, setup
 
-def run_search():
-    # Load data
-    all_data = load_train_test_data()
-    full_train_dict = all_data['train']
-    
-    # Split
-    train_dict, val_dict = train_val_split(full_train_dict)
-    
-    # Make DataLoaders
-    train_loader = make_eeg_dataloader_from_dict(train_dict)
-    val_loader = make_eeg_dataloader_from_dict(val_dict, shuffle=False)
-    
-    ########### 1. Hyper param search : Unsupervised autoencoder ###########
-    # best_model, best_config, best_score, all_results = unsupervised_ae_search(
-    #     train_loader, val_loader, unsup_ae_search_space
-    # )
-    # save_search_results(all_results, "unsupervised_ae")
-    # save_best_model(best_model, best_config, best_score, "unsupervised_ae")
-    
-    # ########### 2. Hyperparameter search: Semi-supervised autoencoder ###########
-    # best_model, best_config, best_score, all_results = semisupervised_ae_search(
-    #     train_loader, val_loader, semi_ae_search_space
-    # )
-    # save_search_results(all_results, "semisupervised_ae")
-    # save_best_model(best_model, best_config, best_score, "semisupervised_ae")
+"""
+Run hyperparameter search for different models:
+1. Unsupervised Autoencoder
+2. Semi-supervised Autoencoder
+3. Semi-supervised RVAE
+4. Unsupervised RVAE (to be implemented)
 
-    ########### 3. Hyper param search : Semi-supervised RVAE ###########
+Hyperparameter grids are defined in `hyperparam_configs.py`.
+Best models/results from each run are saved to 'MODELS_DIR' and 'HYPERPARAM_RESULTS_DIR'
+with timestamps.
+"""
+
+def run_search(train_loader=None, val_loader=None): 
+    # 1) Unsupervised autoencoder
+    best_model, best_config, best_score, all_results = unsupervised_ae_search(
+        train_loader, val_loader, unsup_ae_search_space
+    )
+    save_search_results(all_results, "unsupervised_ae")
+    save_best_model(best_model, best_config, best_score, "unsupervised_ae")
+    
+    # 2) Semi-supervised autoencoder
+    best_model, best_config, best_score, all_results = semisupervised_ae_search(
+        train_loader, val_loader, semi_ae_search_space
+    )
+    save_search_results(all_results, "semisupervised_ae")
+    save_best_model(best_model, best_config, best_score, "semisupervised_ae")
+
+    # 3) Semi-supervised RVAE 
     best_model, best_config, best_score, all_results = semisupervised_rvae_search(
         train_loader, val_loader, semi_rvae_search_space
     )
     save_search_results(all_results, "semisupervised_rvae")
     save_best_model(best_model, best_config, best_score, "semisupervised_rvae")
 
-    ########### 4. Hyper param search: Unsupervised RVAE ###########
+    # 4) Unsupervised RVAE
     # TO-DO
 
 def save_search_results(results, model_type):
@@ -105,6 +106,21 @@ def save_best_model(model, config, score, model_type):
     print(f"Best config saved to: {relative_path_str(config_path)}")
     return model_path, config_path
 
+def get_dataloaders():
+    """Get train and validation DataLoaders"""
+    all_data = load_train_test_data()
+    full_train_dict = all_data['train']
+    
+    # Further split train data into train and validation sets for hyperparameter search
+    train_dict, val_dict = train_val_split(full_train_dict)
+    
+    # Make DataLoaders
+    train_loader = make_eeg_dataloader_from_dict(train_dict)
+    val_loader = make_eeg_dataloader_from_dict(val_dict, shuffle=False)
+    
+    return train_loader, val_loader
+
 if __name__ == "__main__":
     setup()
-    run_search()
+    train_loader, val_loader = get_dataloaders()
+    run_search(train_loader, val_loader)

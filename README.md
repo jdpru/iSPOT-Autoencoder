@@ -83,6 +83,6 @@ This will evaluate all model variants and generate performance comparisons.
 - pandas
 - numpy
 - matplotlib
-- seaborn 🌊
+- seaborn
 
 See `environment.yml` for full environment setup.

@@ -28,7 +28,7 @@ This project uses data from the **iSPOT-D (International Study to Predict Optimi
 - Learns latent representations using only reconstruction loss
 - Latent features → Logistic regression → Response prediction
 
-### 2. Main Model: Semi-supervised Autoencoder ⚡
+### 2. Main Model: Semi-supervised Autoencoder
 - **Dual-head architecture**: Decoder + Predictor heads
 - **Dual loss function**: 
   - Reconstruction loss (MSE) from decoder
